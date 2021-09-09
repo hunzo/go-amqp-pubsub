@@ -1,0 +1,26 @@
+version: '3.7'
+services: 
+  message-broker:
+    image: rabbitmq:3-management-alpine
+    container_name: message-broker
+    ports: 
+      - 5672:5672
+      - 15672:15672
+    restart: always
+
+  publisher:
+    build: ./publisher
+    ports: 
+      - 3000:3000
+    environment: 
+      - AMQP_SERVER_URL=amqp://guest:guest@message-broker:5672/
+    restart:  always
+    depends_on: 
+      - message-broker
+  consumer:
+    build: ./consumer
+    environment: 
+      - AMQP_SERVER_URL=amqp://guest:guest@message-broker:5672/
+    restart:  always
+    depends_on: 
+      - message-broker    
